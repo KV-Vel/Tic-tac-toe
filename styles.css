@@ -53,7 +53,6 @@ h1{
     justify-content: flex-start;
 }
 
-
 .input-name-player1,
 .input-name-player2 {
     text-align: center;
@@ -68,19 +67,24 @@ label,
 }
 
 input {
-    width: 200px;
+    width: 140px;
 
     /*Mozilla, Safari, Edge?*/
     caret-color: transparent; 
     cursor: default;
+    border-bottom: 2px solid transparent;
+    padding: 5px 0;
+    cursor: pointer;
+}
+
+input:focus {
+    caret-color: var(--second-color);
+    border-bottom: 2px solid var(--main-color);
+
 }
 
 img {
     vertical-align: middle;
-}
-
-.rename-btn {
-    display: block;
 }
 
 .item-div {
@@ -93,8 +97,9 @@ img {
     padding: 20px 0;
 }
 
-.item-one,
-.item-two {
+/* .item-circle, */
+div[data-item='circle'],
+div[data-item='cross'] {
     width: 35px;
     height: 35px;
 
@@ -105,20 +110,43 @@ img {
     background-color:var(--second-color);
 }
 
-.item-one {
+div[data-item='cross'] {
     clip-path: var(--cross);
+    animation: 0.5s crossAnim reverse;
 }
 
-.item-two {
+div[data-item='circle'] {
     clip-path: var(--circle);
+    animation: 0.5s circleAnim reverse;
+}
+
+.cross {
+    clip-path: var(--cross); 
+    /* -webkit-clip-path: var(--cross); ;  */
+    background-color:#ffb703; 
+    width: 50px; 
+    height: 50px;
+}
+
+.circle {
+    clip-path: var(--circle); 
+    /* -webkit-clip-path: var(--circle);  */
+    background-color:#ffb703; 
+    width: 50px;
+    height: 50px;
 }
 
 .change-item-btn {
+    display: inline-block;
     border-radius: 15px;
-
+    border: 2px solid var(--second-color);
     padding: 5px;
-
+    transition: transform 0.3s ease-in;
     background-color: var(--main-background);
+}
+
+.change-item-btn:hover{
+    transform: rotateZ(180deg);
 }
 /*SETTING WRAPPER*/
 
@@ -135,17 +163,14 @@ img {
 }
 
 .outer-cells {
-    font-size: 64px; 
-
     background-color: var(--main-color);
 
     border-radius: 5px;
+
+    cursor: pointer;
 }
 
 .inner-cells {
-    width: 50px;
-    height: 50px;
-
     cursor: pointer;
 }
 /*GAME STYLES*/
@@ -178,11 +203,36 @@ footer {
 }
 /*FOOTER*/
 
-/* Можно сделать не эффект перемещения а эффект стирания гугли clip-path animations*/
-/*Можно сделать чтобы грид как бы раздвигался а точнее раздвигался gap from 0 to 15px*/
-/*Хувер эффект на кнопки, пересмотреть разные другие текста, пробовать их скачать*/
-/*Кнопки try again?*/
-/*Add media for smaller devices reduce padding, try to use calc or min max?*/
-/*TODO: сделать эффект клика, чтоб кнопка чуть уменьшалась?*/
-/*TO DO: Mozilla, Safari, Edge?*/
-/*Border to change btn cross -> circle*/
+
+/*ANIMATIONS*/
+@keyframes circleAnim {
+    0% {
+        clip-path: var(--circle);
+    } 
+    100% {
+        clip-path: circle(10%);
+    }
+}
+
+@keyframes crossAnim {
+    0% {
+        clip-path: var(--cross);
+    }
+    100% {
+        clip-path: polygon(45% 35%, 32% 47%, 43% 49%, 33% 54%, 45% 64%, 49% 55%, 54% 65%, 66% 55%, 58% 50%, 66% 47%, 54% 35%, 50% 45%);
+    }
+}
+/*ANIMATIONS*/
+
+/* TO DO list:
+1) Можно сделать чтобы грид как бы раздвигался а точнее раздвигался gap from 0 to 15px
+2) Кнопки try again?
+3) Add media for smaller devices reduce padding, try to use calc or min max?
+4) Always check on Mozilla, Safari, Edge?
+5) Сделать место под сообщения о ходе игрока и победе и тп
+6) Tool tip so X goes first always
+7) ake tool tip window on the side LIKE : Step 1. Enter players names or leave them default
+                                          Step 2. To start the game, simply click on the cell
+                                          Note: 'X' will always go first
+8) firse-line использовать
+*/

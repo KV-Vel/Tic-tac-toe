@@ -1,4 +1,3 @@
-//TO DO: make score reset on reset btn
 "use strict";
 
 const gameBoard = (function () {
@@ -26,21 +25,17 @@ const gameController = (function () {
     let player1 = {
         name: 'Player 1',
         score: 0,
-        item: '0',
-        cssItem: 'clip-path: circle(50% at 50% 50%); \
-        -webkit-clip-path: circle(50% at 50% 50%); \
-        background-color:#ffb703'
+        item: 'x',
+        cssClass: 'cross'
     };
 
     let player2 = {
         name: 'Player 2',
         score: 0,
-        item: 'x', 
-        cssItem: 'clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%); \
-        -webkit-clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);\
-        background-color:#ffb703'
+        item: '0', 
+        cssClass: 'circle'
     };
-
+    
     const winningConditionCheck = () => {
         return [
             [gameBoard.getCell(0, 0), gameBoard.getCell(0, 1), gameBoard.getCell(0, 2)], //firstRow
@@ -53,6 +48,7 @@ const gameController = (function () {
             [gameBoard.getCell(0, 2), gameBoard.getCell(1, 1), gameBoard.getCell(2, 0)] // rightToLeft
         ]
     };
+    const setPlayersNames = (player, value) => {player.name = value};
 
     // First turn only for 'x'
     let choosePlayersTurn = player1.item === 'x' ? player1 : player2;
@@ -103,7 +99,38 @@ const gameController = (function () {
         }
     };
 
+    const createPlayers = (players) => {
+        const firstPlayerName = document.querySelector(".input-name-player1").value;
+        const secondPlayerName = document.querySelector(".input-name-player2").value;
+        const values = [firstPlayerName, secondPlayerName];
+
+        for(let playerIndex = 0; playerIndex < players.length; playerIndex++) {
+            setPlayersNames(players[playerIndex], values[playerIndex]);
+        };
+    }
+
+    const swapPlayersItems = () => {
+        if(player1.item === 'x') {
+            player1.item = '0';
+            player1.cssClass = 'circle';
+
+            player2.item = 'x';
+            player2.cssClass = 'cross';
+            choosePlayersTurn = player2;
+        } else {
+            player1.item = 'x';
+            player1.cssClass = 'cross';
+            choosePlayersTurn = player1;
+
+            player2.item = '0';
+            player2.cssClass = 'circle';
+        }
+    }
+
+    const getPlayersCss = () => getActivePlayer().cssClass;
+
     function playRound(row,column) {
+        createPlayers([player1, player2]);
         console.log(gameBoard.getBoard());
         setItemToCell(row,column);
     }
@@ -113,35 +140,78 @@ const gameController = (function () {
         getScore,
         getActivePlayer,
         getItems,
+        getPlayersCss,
+        swapPlayersItems
     }
 })();
 
 let ScreenController = (function(){
-    const htmlCells = document.querySelectorAll('.inner-cells');
-    
+    const playersInput = document.querySelectorAll('input');
+    const labels = document.querySelectorAll('label');
+    const outerCells = document.querySelectorAll('.outer-cells')
+
     const addPlayersItemToDisplay = (e) => {
+        //Preventing click on already taken cell
+        if (e.target.classList.contains('cross') || e.target.classList.contains('circle')) {return};
+
+        const innerCells = e.target.querySelector('.inner-cells');
         //DOM clicked cells with data-attributes
-        const [row, column] = [e.target.getAttribute('data-value')[0], e.target.getAttribute('data-value')[2]];
-        
-        gameBoard.getCell(row, column) === '' ? 
-        e.target.style.cssText = gameController.getActivePlayer().cssItem : 
+        const [row, column] = [innerCells.getAttribute('data-value')[0], innerCells.getAttribute('data-value')[2]];
+
+        gameBoard.getCell(row, column) === '' ?
+        innerCells.classList.toggle(gameController.getActivePlayer().cssClass) :
         null;
 
         gameController.playRound(row, column);
-    };
 
-    htmlCells.forEach(el => el.addEventListener('click', addPlayersItemToDisplay));
+        // Player can't change Name if game has already started
+        disableInputs();
+    };
+    outerCells.forEach(cell => cell.addEventListener('click', addPlayersItemToDisplay,true)); 
+
+    // Update Names and pass values to code
+    const updateValueName = (e) => e.target.setAttribute('value', e.target.value);
+    playersInput.forEach(input => input.addEventListener('input', updateValueName));
     
+    const disableInputs = () => playersInput.forEach(input => input.disabled = true);
+    
+    //Preventing label to be clicked for input activation
+    const disableLabelsClicks = (e) => e.preventDefault();
+    labels.forEach( label => label.addEventListener('click', disableLabelsClicks));
+
+    //Swap players items
+    const [leftPlayer, rightPlayer] = document.querySelectorAll('.players-items');
+
+    const swapItems = () => {
+        //Swapping x and o
+        gameController.swapPlayersItems()
+        //Swapping data-attributes
+        if (leftPlayer.getAttribute('data-item') === 'cross') {
+            rightPlayer.setAttribute('data-item', 'cross');
+            leftPlayer.setAttribute('data-item', 'circle');
+        } else {
+            rightPlayer.setAttribute('data-item', 'circle');
+            leftPlayer.setAttribute('data-item', 'cross');
+        }
+    }
+    document.querySelector('.change-item-btn')
+            .addEventListener('click', swapItems);
 })();
 
-// Продумать players object creation?
-/**Сделай динамичные инпуты с js
- * https://www.youtube.com/watch?v=KPYhZ5SDZ9g
- */
-/**Когда нажимают на кнопку смены имени, то нужно выделить input или добавить обратно caret-color */
-
-/** Можно импортировать WinningCondition или отттуда как то инфу вытягивать
+/** TODO list:
+ * 1) Сделай динамичные инпуты с js
+ *    https://www.youtube.com/watch?v=KPYhZ5SDZ9g
+ * 2) Можно импортировать WinningCondition или отттуда как то инфу вытягивать
  * и когда пользователь побеждает то подсвечивать квадраты
+ * 3) В конце глянуть его https://github.com/swarnim-me/tic-tac-toe/tree/main/js
+ * 4) Min length у инпутов
+ * 5) OnRestart enable inputs
+ * 6) После этого пуш в гит и players-item-change
+ * 7) По окончании читать css какие то трюки у другие и смотреть playerCreating
+ * 8) Подсвечивать кто из игроков ходит
+ * 9) Cursor pointer group css
+ * 10) Put css into Css folder, updated HTML links
+ * 11) make score reset on reset btn
+ * 12) Download ubuntu, safari
+ * 13) disable cells if gameIsOver
  */
-/** В конце глянуть его https://github.com/swarnim-me/tic-tac-toe/tree/main/js
-*/
