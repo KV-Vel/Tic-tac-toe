@@ -161,11 +161,15 @@ let ScreenController = (function(){
     const outerCells = document.querySelectorAll('.outer-cells');
     const [leftPlayer, rightPlayer] = document.querySelectorAll('.players-items');
     const [firstPlayerScore, secondPlayerScore] = document.querySelectorAll('section > p');
+    const changeItemBtn = document.querySelector('.change-item-btn');
     const [firstPlayerPointer, secondPlayerPointer] = document.querySelectorAll('.player-pointer');
-
+    
     firstPlayerPointer.classList.toggle('highlight');
 
-    const disableInputs = () => playersInput.forEach(input => input.disabled = true);
+    const disableInteraction = () => {
+        playersInput.forEach(input => input.disabled = true);
+        changeItemBtn.disabled = true;
+    };
 
     // Highlighting active player
     const highlightPlayer = () => {
@@ -194,7 +198,7 @@ let ScreenController = (function(){
         }
 
         // Player can't change Name if game has already started
-        gameController.getPlayerCreationStatus() === true ? null : disableInputs();
+        gameController.getPlayerCreationStatus() === true ? null : disableInteraction();
     };
     outerCells.forEach(cell => cell.addEventListener('click', playGame)); 
 
@@ -220,8 +224,8 @@ let ScreenController = (function(){
 
         highlightPlayer();
     }
-    document.querySelector('.change-item-btn')
-            .addEventListener('click', swapItems);
+    
+    changeItemBtn.addEventListener('click', swapItems);
 })();
 
 /** TODO list:
@@ -232,15 +236,10 @@ let ScreenController = (function(){
  * 3) В конце глянуть его https://github.com/swarnim-me/tic-tac-toe/tree/main/js
  * 4) Min length у инпутов
  * 5) OnRestart enable inputs
- * 6) После этого пуш в гит и players-item-change
  * 7) По окончании читать css какие то трюки у другие и смотреть playerCreating
- * 8) Подсвечивать кто из игроков ходит
- * 9) Cursor pointer group css
+ * 9) Cursor pointer groupItAll css
  * 10) Put css into Css folder, updated HTML links
  * 11) make score reset on reset btn
  * 12) Download ubuntu, safari
- * 13) disable cells if gameIsOver
- * 14) Make simple animated arrow (->) which will be positioned on the left of player who has item 'x'. It will go left and right quickly like pointing to the player
  * 15) Make DOM messages and reset
- * 16) Game btn disable when game started or gameended
  */
