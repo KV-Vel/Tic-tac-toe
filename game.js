@@ -69,8 +69,6 @@ const gameController = (function () {
 
     const getScore = () => [player1.score, player2.score]
 
-    const getItems = () => `${player1.name} plays for ${player1.item} and ${player2.name} plays for ${player2.item}`;
-
     const checkForGameResult = (currentPlayer) => {
         // Placed item of active player getting checked on winning pattern of winningCondition
         const gameHasWinner = winningConditionCheck().some(condition => condition.every(itemType => itemType === currentPlayer.item));
@@ -161,10 +159,20 @@ let ScreenController = (function(){
     const playersInput = document.querySelectorAll('input');
     const labels = document.querySelectorAll('label');
     const outerCells = document.querySelectorAll('.outer-cells');
+    const [leftPlayer, rightPlayer] = document.querySelectorAll('.players-items');
     const [firstPlayerScore, secondPlayerScore] = document.querySelectorAll('section > p');
+    const [firstPlayerPointer, secondPlayerPointer] = document.querySelectorAll('.player-pointer');
+
+    firstPlayerPointer.classList.toggle('highlight');
 
     const disableInputs = () => playersInput.forEach(input => input.disabled = true);
-    
+
+    // Highlighting active player
+    const highlightPlayer = () => {
+        firstPlayerPointer.classList.toggle('highlight');
+        secondPlayerPointer.classList.toggle('highlight');
+    };
+
     const playGame = (e) => {
         const clickedCell = e.target;
         //Preventing click on already taken cell
@@ -173,12 +181,14 @@ let ScreenController = (function(){
         const innerCells = clickedCell.querySelector('.inner-cells');
         //DOM clicked cells with data-attributes
         const [row, column] = [innerCells.getAttribute('data-value')[0], innerCells.getAttribute('data-value')[2]];
+
         if (!gameController.getGameStatus()) {
             gameBoard.getCell(row, column) === '' ?
             innerCells.classList.toggle(gameController.getActivePlayer().cssClass) :
             null;
 
             gameController.playRound(row, column);
+            highlightPlayer();
             
             [firstPlayerScore.textContent, secondPlayerScore.textContent] = gameController.getScore();
         }
@@ -192,14 +202,9 @@ let ScreenController = (function(){
     const updateValueName = (e) => clickedCell.setAttribute('value', e.target.value);
     playersInput.forEach(input => input.addEventListener('input', updateValueName));
     
-  
-    
     //Preventing label to be clicked for input activation
     const disableLabelsClicks = (e) => e.preventDefault();
     labels.forEach( label => label.addEventListener('click', disableLabelsClicks));
-
-    //Swap players items
-    const [leftPlayer, rightPlayer] = document.querySelectorAll('.players-items');
 
     const swapItems = () => {
         //Swapping x and o
@@ -212,6 +217,8 @@ let ScreenController = (function(){
             rightPlayer.setAttribute('data-item', 'circle');
             leftPlayer.setAttribute('data-item', 'cross');
         }
+
+        highlightPlayer();
     }
     document.querySelector('.change-item-btn')
             .addEventListener('click', swapItems);
@@ -234,4 +241,6 @@ let ScreenController = (function(){
  * 12) Download ubuntu, safari
  * 13) disable cells if gameIsOver
  * 14) Make simple animated arrow (->) which will be positioned on the left of player who has item 'x'. It will go left and right quickly like pointing to the player
+ * 15) Make DOM messages and reset
+ * 16) Game btn disable when game started or gameended
  */

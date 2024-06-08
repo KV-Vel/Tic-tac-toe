@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap');
 
 :root {
@@ -50,7 +51,7 @@ h1{
 /*SETTING WRAPPER*/
 .settings-wrapper {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-content: center;
     justify-content: flex-start;
 }
@@ -59,6 +60,15 @@ h1{
 .input-name-player2 {
     text-align: center;
     color: var(--main-color);
+}
+
+.player-pointer {
+    color:transparent;
+}
+
+.highlight {
+    animation: activePlayerHighlight 1s infinite;
+    color: var(--main-color); 
 }
 
 label,
@@ -224,6 +234,18 @@ footer {
         clip-path: polygon(45% 35%, 32% 47%, 43% 49%, 33% 54%, 45% 64%, 49% 55%, 54% 65%, 66% 55%, 58% 50%, 66% 47%, 54% 35%, 50% 45%);
     }
 }
+
+@keyframes activePlayerHighlight {
+    0% {
+        transform: translateX(-5px);
+    } 
+    50% {
+        transform: translateX(5px);
+    }
+    100% {
+        transform: translateX(-5px);
+    }
+}
 /*ANIMATIONS*/
 
 /* TO DO list:
@@ -238,3 +260,5 @@ footer {
                                           Note: 'X' will always go first
 8) firse-line использовать
 */
+
+/*
