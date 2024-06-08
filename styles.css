@@ -19,6 +19,8 @@ body {
     font-weight: 400;
     font-style: normal;
 
+    scroll-behavior: smooth;
+
     background: var(--main-background);
     color: var(--main-color);
 }

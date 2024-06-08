@@ -22,6 +22,9 @@ const gameBoard = (function () {
 })();
 
 const gameController = (function () {
+    let isPlayersCreated = false;
+    let isGameEnded = false;
+
     let player1 = {
         name: 'Player 1',
         score: 0,
@@ -64,7 +67,7 @@ const gameController = (function () {
 
     const resetPlayersTurn = () => choosePlayersTurn = player1.item === 'x' ? player1 : player2;
 
-    const getScore = () => console.log(`Overall score is ${player1.score} : ${player2.score}`);
+    const getScore = () => [player1.score, player2.score]
 
     const getItems = () => `${player1.name} plays for ${player1.item} and ${player2.name} plays for ${player2.item}`;
 
@@ -78,12 +81,13 @@ const gameController = (function () {
             increaseScore();
             getScore();
             resetPlayersTurn();
-            return
+            isGameEnded = true;
+            return 
         } else if (!gameHasWinner && gameHasNoWinner) {
-            console.log('This game has no winner');
             getScore();
             resetPlayersTurn();
-            return
+            isGameEnded = true;
+            return 'This game has no winner'
         }
 
         setActivePlayer();
@@ -129,17 +133,25 @@ const gameController = (function () {
 
     const getPlayersCss = () => getActivePlayer().cssClass;
 
+    const getGameStatus = () => isGameEnded;
+
+    const getPlayerCreationStatus = () => isPlayersCreated;
+
     function playRound(row,column) {
-        createPlayers([player1, player2]);
-        console.log(gameBoard.getBoard());
-        setItemToCell(row,column);
+        if(!isGameEnded) {
+            isPlayersCreated === true ? null : createPlayers([player1, player2]);
+            console.log(gameBoard.getBoard());
+            setItemToCell(row,column);
+            
+        }
     }
 
     return {
         playRound,
+        getGameStatus,
+        getPlayerCreationStatus,
         getScore,
         getActivePlayer,
-        getItems,
         getPlayersCss,
         swapPlayersItems
     }
@@ -148,32 +160,39 @@ const gameController = (function () {
 let ScreenController = (function(){
     const playersInput = document.querySelectorAll('input');
     const labels = document.querySelectorAll('label');
-    const outerCells = document.querySelectorAll('.outer-cells')
+    const outerCells = document.querySelectorAll('.outer-cells');
+    const [firstPlayerScore, secondPlayerScore] = document.querySelectorAll('section > p');
 
-    const addPlayersItemToDisplay = (e) => {
+    const disableInputs = () => playersInput.forEach(input => input.disabled = true);
+    
+    const playGame = (e) => {
+        const clickedCell = e.target;
         //Preventing click on already taken cell
-        if (e.target.classList.contains('cross') || e.target.classList.contains('circle')) {return};
+        if (clickedCell.classList.contains('cross') || clickedCell.classList.contains('circle')) {return};
 
-        const innerCells = e.target.querySelector('.inner-cells');
+        const innerCells = clickedCell.querySelector('.inner-cells');
         //DOM clicked cells with data-attributes
         const [row, column] = [innerCells.getAttribute('data-value')[0], innerCells.getAttribute('data-value')[2]];
+        if (!gameController.getGameStatus()) {
+            gameBoard.getCell(row, column) === '' ?
+            innerCells.classList.toggle(gameController.getActivePlayer().cssClass) :
+            null;
 
-        gameBoard.getCell(row, column) === '' ?
-        innerCells.classList.toggle(gameController.getActivePlayer().cssClass) :
-        null;
-
-        gameController.playRound(row, column);
+            gameController.playRound(row, column);
+            
+            [firstPlayerScore.textContent, secondPlayerScore.textContent] = gameController.getScore();
+        }
 
         // Player can't change Name if game has already started
-        disableInputs();
+        gameController.getPlayerCreationStatus() === true ? null : disableInputs();
     };
-    outerCells.forEach(cell => cell.addEventListener('click', addPlayersItemToDisplay,true)); 
+    outerCells.forEach(cell => cell.addEventListener('click', playGame)); 
 
     // Update Names and pass values to code
-    const updateValueName = (e) => e.target.setAttribute('value', e.target.value);
+    const updateValueName = (e) => clickedCell.setAttribute('value', e.target.value);
     playersInput.forEach(input => input.addEventListener('input', updateValueName));
     
-    const disableInputs = () => playersInput.forEach(input => input.disabled = true);
+  
     
     //Preventing label to be clicked for input activation
     const disableLabelsClicks = (e) => e.preventDefault();
@@ -214,4 +233,5 @@ let ScreenController = (function(){
  * 11) make score reset on reset btn
  * 12) Download ubuntu, safari
  * 13) disable cells if gameIsOver
+ * 14) Make simple animated arrow (->) which will be positioned on the left of player who has item 'x'. It will go left and right quickly like pointing to the player
  */
