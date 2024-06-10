@@ -215,6 +215,11 @@ footer {
 }
 /*FOOTER*/
 
+.highlight-winning-cells {
+    border: 1px solid #75c195;  
+    background-color: #75c1958a;
+}
+
 
 /*ANIMATIONS*/
 @keyframes circleAnim {

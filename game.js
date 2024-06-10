@@ -22,8 +22,15 @@ const gameBoard = (function () {
 })();
 
 const gameController = (function () {
-    let isPlayersCreated = false;
-    let isGameEnded = false;
+
+    let gameStatuses = {
+        isGameEnded: false,
+        isPlayersCreated: false
+    };
+
+    const isGameEnded = () => gameStatuses.isGameEnded;
+
+    const isPlayersCreated = () => gameStatuses.isPlayersCreated;
 
     let player1 = {
         name: 'Player 1',
@@ -39,16 +46,16 @@ const gameController = (function () {
         cssClass: 'circle'
     };
     
-    const winningConditionCheck = () => {
+    const winningCondition = () => {
         return [
-            [gameBoard.getCell(0, 0), gameBoard.getCell(0, 1), gameBoard.getCell(0, 2)], //firstRow
-            [gameBoard.getCell(1, 0), gameBoard.getCell(1, 1), gameBoard.getCell(1, 2)], //secondRow
-            [gameBoard.getCell(2, 0), gameBoard.getCell(2, 1), gameBoard.getCell(2, 2)], //thirdRow
-            [gameBoard.getCell(0, 0), gameBoard.getCell(1, 0), gameBoard.getCell(2, 0)], //firstColumn
-            [gameBoard.getCell(0, 1), gameBoard.getCell(1, 1), gameBoard.getCell(2, 1)], //secondColumn
-            [gameBoard.getCell(0, 2), gameBoard.getCell(1, 2), gameBoard.getCell(2, 2)], //thirdColumn
-            [gameBoard.getCell(0, 0), gameBoard.getCell(1, 1), gameBoard.getCell(2, 2)], //leftToRight
-            [gameBoard.getCell(0, 2), gameBoard.getCell(1, 1), gameBoard.getCell(2, 0)] // rightToLeft
+            [[gameBoard.getCell(0, 0), gameBoard.getCell(0, 1), gameBoard.getCell(0, 2)], ['0,0', '0,1', '0,2']], //firstRow
+            [[gameBoard.getCell(1, 0), gameBoard.getCell(1, 1), gameBoard.getCell(1, 2)], ['1,0', '1,1', '1,2']], //secondRow
+            [[gameBoard.getCell(2, 0), gameBoard.getCell(2, 1), gameBoard.getCell(2, 2)], ['2,0', '2,1', '2,2']], //thirdRow
+            [[gameBoard.getCell(0, 0), gameBoard.getCell(1, 0), gameBoard.getCell(2, 0)], ['0,0', '1,0', '2,0']], //firstColumn
+            [[gameBoard.getCell(0, 1), gameBoard.getCell(1, 1), gameBoard.getCell(2, 1)], ['0,1', '1,1', '2,1']], //secondColumn
+            [[gameBoard.getCell(0, 2), gameBoard.getCell(1, 2), gameBoard.getCell(2, 2)], ['0,2', '1,2', '2,2']], //thirdColumn
+            [[gameBoard.getCell(0, 0), gameBoard.getCell(1, 1), gameBoard.getCell(2, 2)], ['0,0', '1,1', '2,2']], //leftToRight
+            [[gameBoard.getCell(0, 2), gameBoard.getCell(1, 1), gameBoard.getCell(2, 0)], ['0,2', '1,1', '2,0']], // rightToLeft
         ]
     };
     const setPlayersNames = (player, value) => {player.name = value};
@@ -71,20 +78,22 @@ const gameController = (function () {
 
     const checkForGameResult = (currentPlayer) => {
         // Placed item of active player getting checked on winning pattern of winningCondition
-        const gameHasWinner = winningConditionCheck().some(condition => condition.every(itemType => itemType === currentPlayer.item));
-        const gameHasNoWinner = winningConditionCheck().every(condition => condition.every(itemType => itemType !== ''));
-
+        const gameHasWinner = winningCondition().some((condition) => condition[0].every(itemType => itemType === currentPlayer.item));
+        const gameHasNoWinner = winningCondition().every(condition => condition[0].every(itemType => itemType !== ''));
+        
         if (gameHasWinner) {
             console.log(`${getActivePlayer().name} has won`);
             increaseScore();
             getScore();
             resetPlayersTurn();
-            isGameEnded = true;
-            return 
+            gameStatuses.isGameEnded = true;
+            // Slice of winningCondition last items
+            const winningConsoleCells = winningCondition().filter(condition => condition[0].every(item => item === currentPlayer.item))[0][1];
+            return winningConsoleCells
         } else if (!gameHasWinner && gameHasNoWinner) {
             getScore();
             resetPlayersTurn();
-            isGameEnded = true;
+            gameStatuses.isGameEnded = true;
             return 'This game has no winner'
         }
 
@@ -94,7 +103,7 @@ const gameController = (function () {
     let setItemToCell = (row, column) => {
         if (gameBoard.getCell(row, column) === '') {
             gameBoard.getBoard()[row][column] = getActivePlayer().item;
-            checkForGameResult(getActivePlayer());
+            return checkForGameResult(getActivePlayer());
         } else {
             console.log(`This cell already have an item`);
             return 
@@ -131,23 +140,18 @@ const gameController = (function () {
 
     const getPlayersCss = () => getActivePlayer().cssClass;
 
-    const getGameStatus = () => isGameEnded;
-
-    const getPlayerCreationStatus = () => isPlayersCreated;
-
     function playRound(row,column) {
-        if(!isGameEnded) {
-            isPlayersCreated === true ? null : createPlayers([player1, player2]);
+        if(!gameStatuses.isGameEnded) {
+            gameStatuses.isPlayersCreated === true ? null : createPlayers([player1, player2]);
             console.log(gameBoard.getBoard());
-            setItemToCell(row,column);
-            
+            return setItemToCell(row,column);
         }
     }
 
     return {
         playRound,
-        getGameStatus,
-        getPlayerCreationStatus,
+        isGameEnded,
+        isPlayersCreated,
         getScore,
         getActivePlayer,
         getPlayersCss,
@@ -179,6 +183,7 @@ let ScreenController = (function(){
 
     const playGame = (e) => {
         const clickedCell = e.target;
+        let winningCells;
         //Preventing click on already taken cell
         if (clickedCell.classList.contains('cross') || clickedCell.classList.contains('circle')) {return};
 
@@ -186,20 +191,25 @@ let ScreenController = (function(){
         //DOM clicked cells with data-attributes
         const [row, column] = [innerCells.getAttribute('data-value')[0], innerCells.getAttribute('data-value')[2]];
 
-        if (!gameController.getGameStatus()) {
+        //If game not ended
+        if (!gameController.isGameEnded()) {
+
             gameBoard.getCell(row, column) === '' ?
             innerCells.classList.toggle(gameController.getActivePlayer().cssClass) :
             null;
 
-            gameController.playRound(row, column);
+            winningCells = gameController.playRound(row, column);
             highlightPlayer();
             
             [firstPlayerScore.textContent, secondPlayerScore.textContent] = gameController.getScore();
         }
 
         // Player can't change Name if game has already started
-        gameController.getPlayerCreationStatus() === true ? null : disableInteraction();
+        gameController.isPlayersCreated() === true ? null : disableInteraction();
+ 
+        return gameController.isGameEnded() ?  highlightWinningCells(winningCells) : null
     };
+    
     outerCells.forEach(cell => cell.addEventListener('click', playGame)); 
 
     // Update Names and pass values to code
@@ -223,23 +233,31 @@ let ScreenController = (function(){
         }
 
         highlightPlayer();
-    }
+    };
     
     changeItemBtn.addEventListener('click', swapItems);
+
+    const highlightWinningCells = (winningCells) => {
+        const winningDOMCells = document.querySelectorAll(`[data-outer-cell-value = "${winningCells[0][0]},${winningCells[0][2]}"],
+                                                           [data-outer-cell-value = "${winningCells[1][0]},${winningCells[1][2]}"],
+                                                           [data-outer-cell-value = "${winningCells[2][0]},${winningCells[2][2]}"]`
+                                                        );
+
+        winningDOMCells.forEach(cell => cell.classList.toggle('highlight-winning-cells'));
+    };
+  
 })();
 
 /** TODO list:
  * 1) Сделай динамичные инпуты с js
  *    https://www.youtube.com/watch?v=KPYhZ5SDZ9g
- * 2) Можно импортировать WinningCondition или отттуда как то инфу вытягивать
- * и когда пользователь побеждает то подсвечивать квадраты
  * 3) В конце глянуть его https://github.com/swarnim-me/tic-tac-toe/tree/main/js
  * 4) Min length у инпутов
  * 5) OnRestart enable inputs
  * 7) По окончании читать css какие то трюки у другие и смотреть playerCreating
- * 9) Cursor pointer groupItAll css
  * 10) Put css into Css folder, updated HTML links
  * 11) make score reset on reset btn
  * 12) Download ubuntu, safari
  * 15) Make DOM messages and reset
+ * 16) Reset button можно сделать так: заменить change item btn на reset btn -> Удалить event listenerы??
  */
