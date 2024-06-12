@@ -85,7 +85,7 @@ const gameController = (function () {
             console.log(`${getActivePlayer().name} has won`);
             increaseScore();
             getScore();
-            resetPlayersTurn();
+            // resetPlayersTurn();
             gameStatuses.isGameEnded = true;
             // Slice of winningCondition last items
             const winningConsoleCells = winningCondition().filter(condition => condition[0].every(item => item === currentPlayer.item))[0][1];
@@ -184,6 +184,11 @@ let ScreenController = (function(){
         secondPlayerPointer.classList.toggle('highlight');
     };
 
+    const showWinnersMessage = (winningPlayer) => {
+        const winnersMessageDiv = document.querySelector('.winner-message-div');
+        winnersMessageDiv.textContent = `${winningPlayer} has won.`;
+    }
+
     const playGame = (e) => {
         const clickedCell = e.target;
         let winningCells;
@@ -207,10 +212,14 @@ let ScreenController = (function(){
             [firstPlayerScore.textContent, secondPlayerScore.textContent] = gameController.getScore();
         }
 
+        if (gameController.isGameEnded()) {
+            showWinnersMessage(gameController.getActivePlayer().name);
+            highlightWinningCells(winningCells);
+        }
+
         // Player can't change Name if game has already started
         gameController.isPlayersCreated() === true ? null : disableInteraction();
- 
-        return gameController.isGameEnded() ?  highlightWinningCells(winningCells) : null
+        
     };
     
     outerCells.forEach(cell => cell.addEventListener('click', playGame)); 
@@ -260,7 +269,6 @@ let ScreenController = (function(){
     };
     tooltip.addEventListener('mouseover', showToolTip);
     tooltip.addEventListener('mouseout', hideToolTip);
-    
 })();
 
 /** TODO list:
