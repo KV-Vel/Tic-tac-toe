@@ -167,6 +167,9 @@ let ScreenController = (function(){
     const [firstPlayerScore, secondPlayerScore] = document.querySelectorAll('section > p');
     const changeItemBtn = document.querySelector('.change-item-btn');
     const [firstPlayerPointer, secondPlayerPointer] = document.querySelectorAll('.player-pointer');
+    const tooltip = document.querySelector('.tooltip');
+    const toolTipWrapper = document.querySelector('.appearing-tooltip');
+    const showToolTipSymbol = document.querySelector('i');
     
     firstPlayerPointer.classList.toggle('highlight');
 
@@ -245,7 +248,19 @@ let ScreenController = (function(){
 
         winningDOMCells.forEach(cell => cell.classList.toggle('highlight-winning-cells'));
     };
-  
+
+    const showToolTip = () => {
+        toolTipWrapper.style.cssText = "display: block;";
+        showToolTipSymbol.style.cssText = "display: none";
+    };
+
+    const hideToolTip = () => {
+        toolTipWrapper.style.cssText = "display: none;"
+        showToolTipSymbol.style.cssText = "display: block";
+    };
+    tooltip.addEventListener('mouseover', showToolTip);
+    tooltip.addEventListener('mouseout', hideToolTip);
+    
 })();
 
 /** TODO list:
@@ -254,10 +269,12 @@ let ScreenController = (function(){
  * 3) В конце глянуть его https://github.com/swarnim-me/tic-tac-toe/tree/main/js
  * 4) Min length у инпутов
  * 5) OnRestart enable inputs
- * 7) По окончании читать css какие то трюки у другие и смотреть playerCreating
  * 10) Put css into Css folder, updated HTML links
  * 11) make score reset on reset btn
  * 12) Download ubuntu, safari
  * 15) Make DOM messages and reset
  * 16) Reset button можно сделать так: заменить change item btn на reset btn -> Удалить event listenerы??
+ * 17) calc for padding of .tooltip
+ * 18) add bots? At least check minimax algorithm
+ * 19) Make phone layout for game
  */

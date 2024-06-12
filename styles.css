@@ -66,11 +66,6 @@ h1{
     color:transparent;
 }
 
-.highlight {
-    animation: activePlayerHighlight 1s infinite;
-    color: var(--main-color); 
-}
-
 label,
 .outer-cells {
     display: flex;
@@ -169,9 +164,57 @@ div[data-item='circle'] {
     grid-template-rows: repeat(3, 100px);
     justify-content: center;
 
-    padding: 60px 0;
+    justify-self: center;
 
+    padding: 60px 0;
     gap: 10px;
+}
+
+.tooltip {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    position: fixed;
+    top:50%;
+    left:0;
+    width: 30px;
+    height: 100px;
+
+    font-size: 1.5rem;
+    color: black;
+
+    overflow: hidden;
+    border-radius: 2px;
+    background-color: var(--second-color);
+    cursor: pointer;
+
+    transition: 300ms;
+}
+
+.tooltip:hover {
+    width: 20%;
+    height: 150px;
+    border-radius: 2px 10px 10px 2px;
+}
+
+.appearing-tooltip {
+    display: none;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: left;
+    padding: 0 35px;
+}
+
+ul {
+    list-style: disc outside;
+}
+
+.note,
+.note > span {
+    font-size: 1rem;
+    padding-top: 10px;
+    text-align: left;
 }
 
 .outer-cells {
@@ -193,7 +236,8 @@ div[data-item='circle'] {
     justify-content: space-evenly;
 }
 
-p {
+.first-player-score,
+.second-player-score {
     padding: 25px;
     font-size: 2rem;
 }
@@ -215,11 +259,19 @@ footer {
 }
 /*FOOTER*/
 
+/*TOGGLE CLASSES*/
+
+.highlight {
+    animation: activePlayerHighlight 1s infinite;
+    color: var(--main-color); 
+}
+
 .highlight-winning-cells {
     border: 1px solid #75c195;  
     background-color: #75c1958a;
 }
 
+/*TOGGLE CLASSES*/
 
 /*ANIMATIONS*/
 @keyframes circleAnim {
@@ -254,16 +306,8 @@ footer {
 /*ANIMATIONS*/
 
 /* TO DO list:
-1) Можно сделать чтобы грид как бы раздвигался а точнее раздвигался gap from 0 to 15px
 2) Кнопки try again?
 3) Add media for smaller devices reduce padding, try to use calc or min max?
 4) Always check on Mozilla, Safari, Edge?
 5) Сделать место под сообщения о ходе игрока и победе и тп
-6) Tool tip so X goes first always
-7) ake tool tip window on the side LIKE : Step 1. Enter players names or leave them default
-                                          Step 2. To start the game, simply click on the cell
-                                          Note: 'X' will always go first
-8) firse-line использовать
 */
-
-/*
