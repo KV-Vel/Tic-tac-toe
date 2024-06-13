@@ -29,6 +29,7 @@ const gameController = (function () {
     };
 
     const isGameEnded = () => gameStatuses.isGameEnded;
+    const setGameStatus = (value) => gameStatuses.isGameEnded = value;
 
     const isPlayersCreated = () => gameStatuses.isPlayersCreated;
 
@@ -58,6 +59,11 @@ const gameController = (function () {
             [[gameBoard.getCell(0, 2), gameBoard.getCell(1, 1), gameBoard.getCell(2, 0)], ['0,2', '1,1', '2,0']], // rightToLeft
         ]
     };
+    const resetScore = () => {
+        player1.score = 0;
+        player2.score = 0;
+    };
+
     const setPlayersNames = (player, value) => {player.name = value};
 
     // First turn only for 'x'
@@ -151,10 +157,12 @@ const gameController = (function () {
     return {
         playRound,
         isGameEnded,
+        setGameStatus,
         isPlayersCreated,
         getScore,
         getActivePlayer,
         getPlayersCss,
+        resetScore,
         swapPlayersItems
     }
 })();
@@ -170,12 +178,14 @@ let ScreenController = (function(){
     const tooltip = document.querySelector('.tooltip');
     const toolTipWrapper = document.querySelector('.appearing-tooltip');
     const showToolTipSymbol = document.querySelector('i');
-    
+    const newRoundBtn = document.querySelector('.new-round-btn');
+    const resetBtn = document.querySelector('.reset-score');
+
     firstPlayerPointer.classList.toggle('highlight');
 
-    const disableInteraction = () => {
-        playersInput.forEach(input => input.disabled = true);
-        changeItemBtn.disabled = true;
+    const disableInteraction = (value) => {
+        playersInput.forEach(input => input.disabled = value);
+        changeItemBtn.disabled = value;
     };
 
     // Highlighting active player
@@ -186,7 +196,7 @@ let ScreenController = (function(){
 
     const showWinnersMessage = (winningPlayer) => {
         const winnersMessageDiv = document.querySelector('.winner-message-div');
-        winnersMessageDiv.textContent = `${winningPlayer} has won.`;
+        winnersMessageDiv.textContent = !winningPlayer ? "" : `${winningPlayer} has won.`;
     }
 
     const playGame = (e) => {
@@ -214,18 +224,18 @@ let ScreenController = (function(){
 
         if (gameController.isGameEnded()) {
             showWinnersMessage(gameController.getActivePlayer().name);
-            highlightWinningCells(winningCells);
+            toggleWinningCells(winningCells);
         }
 
         // Player can't change Name if game has already started
-        gameController.isPlayersCreated() === true ? null : disableInteraction();
+        gameController.isPlayersCreated() === true ? null : disableInteraction(true);
         
     };
     
     outerCells.forEach(cell => cell.addEventListener('click', playGame)); 
 
     // Update Names and pass values to code
-    const updateValueName = (e) => clickedCell.setAttribute('value', e.target.value);
+    const updateValueName = (e) => e.target.setAttribute('value', e.target.value);
     playersInput.forEach(input => input.addEventListener('input', updateValueName));
     
     //Preventing label to be clicked for input activation
@@ -249,7 +259,7 @@ let ScreenController = (function(){
     
     changeItemBtn.addEventListener('click', swapItems);
 
-    const highlightWinningCells = (winningCells) => {
+    const toggleWinningCells = (winningCells) => {
         const winningDOMCells = document.querySelectorAll(`[data-outer-cell-value = "${winningCells[0][0]},${winningCells[0][2]}"],
                                                            [data-outer-cell-value = "${winningCells[1][0]},${winningCells[1][2]}"],
                                                            [data-outer-cell-value = "${winningCells[2][0]},${winningCells[2][2]}"]`
@@ -269,6 +279,24 @@ let ScreenController = (function(){
     };
     tooltip.addEventListener('mouseover', showToolTip);
     tooltip.addEventListener('mouseout', hideToolTip);
+
+    const restartRound = () => {
+        const allInnerCells = document.querySelectorAll('.inner-cells');
+
+        allInnerCells.forEach(innerCell => innerCell.classList = 'inner-cells');
+        gameBoard.clearBoard();
+        disableInteraction(false);
+        showWinnersMessage();
+        outerCells.forEach(cell => cell.classList.remove('highlight-winning-cells'));
+        gameController.setGameStatus(false);
+    };
+    newRoundBtn.addEventListener('click', restartRound);
+
+    const resetScore = () => {
+        gameController.resetScore();
+        [firstPlayerScore.textContent, secondPlayerScore.textContent] = gameController.getScore();
+    };
+    resetBtn.addEventListener('click',resetScore);
 })();
 
 /** TODO list:
@@ -276,13 +304,10 @@ let ScreenController = (function(){
  *    https://www.youtube.com/watch?v=KPYhZ5SDZ9g
  * 3) В конце глянуть его https://github.com/swarnim-me/tic-tac-toe/tree/main/js
  * 4) Min length у инпутов
- * 5) OnRestart enable inputs
  * 10) Put css into Css folder, updated HTML links
- * 11) make score reset on reset btn
  * 12) Download ubuntu, safari
- * 15) Make DOM messages and reset
- * 16) Reset button можно сделать так: заменить change item btn на reset btn -> Удалить event listenerы??
  * 17) calc for padding of .tooltip
  * 18) add bots? At least check minimax algorithm
  * 19) Make phone layout for game
+ * 20) Add icon
  */

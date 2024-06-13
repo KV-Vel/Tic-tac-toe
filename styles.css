@@ -44,7 +44,7 @@ main {
 
 h1{
     font-size: 64px;
-    padding: 45px 0;
+    padding: 35px 0;
 }
 
 
@@ -60,6 +60,7 @@ h1{
 .input-name-player2 {
     text-align: center;
     color: var(--main-color);
+    font-size: 1.8rem;
 }
 
 .player-pointer {
@@ -75,12 +76,11 @@ label,
 
 input {
     width: 140px;
-
-    /*Mozilla, Safari, Edge?*/
-    caret-color: transparent; 
-    cursor: default;
-    border-bottom: 2px solid transparent;
     padding: 5px 0;
+
+    caret-color: transparent; 
+
+    border-bottom: 2px solid transparent;
     cursor: pointer;
 }
 
@@ -129,7 +129,6 @@ div[data-item='circle'] {
 
 .cross {
     clip-path: var(--cross); 
-    /* -webkit-clip-path: var(--cross); ;  */
     background-color:#ffb703; 
     width: 50px; 
     height: 50px;
@@ -137,7 +136,6 @@ div[data-item='circle'] {
 
 .circle {
     clip-path: var(--circle); 
-    /* -webkit-clip-path: var(--circle);  */
     background-color:#ffb703; 
     width: 50px;
     height: 50px;
@@ -164,8 +162,6 @@ div[data-item='circle'] {
     grid-template-rows: repeat(3, 100px);
     justify-content: center;
 
-    justify-self: center;
-
     padding: 50px 0;
     gap: 10px;
 }
@@ -174,7 +170,7 @@ div[data-item='circle'] {
     display: flex;
     flex-direction: column;
     justify-content: center;
-
+    font-family:'Courier New', Courier, monospace;
     position: fixed;
     top:50%;
     left:0;
@@ -230,10 +226,35 @@ ul {
 }
 /*GAME STYLES*/
 
-/*SCORE TABLE*/
+/*SCORE DIV*/
+.button-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.new-round-btn,
+.reset-score {
+    border: 1px solid transparent;
+    color: var(--second-color);
+    font-size: 1rem;
+    height: 50%;
+    align-self: center;
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    border-radius: 2px;
+    width: 130px;
+}
+
+.new-round-btn:hover,
+.reset-score:hover {
+    border: 1px solid var(--second-color);
+}
+
 .winner-message-div {
     font-size: 1rem;
     height: 20px;
+    padding-top: 15px;
 }
 
 .score-wrapper{
@@ -246,7 +267,11 @@ ul {
     padding: 25px;
     font-size: 2rem;
 }
-/*SCORE TABLE*/
+
+section {
+    width: 70px;
+}
+/*SCORE DIV*/
 
 /*FOOTER*/
 footer {
@@ -311,8 +336,6 @@ footer {
 /*ANIMATIONS*/
 
 /* TO DO list:
-2) Кнопки try again?
 3) Add media for smaller devices reduce padding, try to use calc or min max?
 4) Always check on Mozilla, Safari, Edge?
-5) Сделать место под сообщения о ходе игрока и победе и тп
 */
