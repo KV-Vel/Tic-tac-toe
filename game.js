@@ -59,6 +59,7 @@ const gameController = (function () {
             [[gameBoard.getCell(0, 2), gameBoard.getCell(1, 1), gameBoard.getCell(2, 0)], ['0,2', '1,1', '2,0']], // rightToLeft
         ]
     };
+
     const resetScore = () => {
         player1.score = 0;
         player2.score = 0;
@@ -91,8 +92,8 @@ const gameController = (function () {
             console.log(`${getActivePlayer().name} has won`);
             increaseScore();
             getScore();
-            // resetPlayersTurn();
             gameStatuses.isGameEnded = true;
+
             // Slice of winningCondition last items
             const winningConsoleCells = winningCondition().filter(condition => condition[0].every(item => item === currentPlayer.item))[0][1];
             return winningConsoleCells
@@ -203,7 +204,7 @@ let ScreenController = (function(){
         const clickedCell = e.target;
         let winningCells;
         //Preventing click on already taken cell
-        if (clickedCell.classList.contains('cross') || clickedCell.classList.contains('circle')) {return};
+        if (clickedCell.classList.contains('cross') || clickedCell.classList.contains('circle')) return;
 
         const innerCells = clickedCell.querySelector('.inner-cells');
         //DOM clicked cells with data-attributes
@@ -234,8 +235,19 @@ let ScreenController = (function(){
     
     outerCells.forEach(cell => cell.addEventListener('click', playGame)); 
 
+    // Increase Width of inputs with new symbols added
+    const increaseWidthOfInputs = (e) => {
+        const numberOfChars = e.target.value.length;
+        if (numberOfChars >= 8) {
+            const updatedInputLength = `${numberOfChars}ch`;
+            e.target.style.width = updatedInputLength;
+        }
+    };
     // Update Names and pass values to code
-    const updateValueName = (e) => e.target.setAttribute('value', e.target.value);
+    const updateValueName = (e) => {
+        e.target.setAttribute('value', e.target.value);
+        increaseWidthOfInputs(e)
+    };
     playersInput.forEach(input => input.addEventListener('input', updateValueName));
     
     //Preventing label to be clicked for input activation
@@ -300,10 +312,7 @@ let ScreenController = (function(){
 })();
 
 /** TODO list:
- * 1) Сделай динамичные инпуты с js
- *    https://www.youtube.com/watch?v=KPYhZ5SDZ9g
  * 3) В конце глянуть его https://github.com/swarnim-me/tic-tac-toe/tree/main/js
- * 4) Min length у инпутов
  * 10) Put css into Css folder, updated HTML links
  * 12) Download ubuntu, safari
  * 17) calc for padding of .tooltip

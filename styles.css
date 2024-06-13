@@ -64,6 +64,7 @@ h1{
 }
 
 .player-pointer {
+    padding-right: 5px;
     color:transparent;
 }
 
