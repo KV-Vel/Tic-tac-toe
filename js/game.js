@@ -313,3 +313,4 @@ const gameController = (function () {
         };
         resetBtn.addEventListener('click', resetScore);
     })();
+    
